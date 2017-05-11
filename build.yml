@@ -1,0 +1,75 @@
+---
+- hosts: builder
+  gather_facts: true
+  become_method: sudo
+  become_user: root
+
+  tasks:
+    - name: Install repo
+      yum_repository:
+        name: pelican
+        description: pelican build for EL7
+        baseurl: http://notting.fedorapeople.org/pelican/
+        enabled: True
+        gpgcheck: False
+        state: present
+
+    - name: Install required packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      become: true
+      with_items:
+      - httpd
+      - git
+      - python2-pelican
+      - zip
+    
+    - name: Ensure webserver is running
+      service:
+        name: httpd
+        state: started
+
+    - name: Build a temporary directory
+      tempfile:
+        state: directory
+      register: tmpdir
+
+    - block:
+        - name: Download software to build
+          git:    
+            dest: "{{ tmpdir.path }}"
+            repo: https://github.com/wenottingham/sampleapp
+            version: "{{ revision | default('HEAD')}}"
+            force: true
+          register: scm_result
+    
+        - name: Build software
+          command: pelican content
+          args:
+            chdir: "{{ tmpdir.path }}"
+    
+        - name: Archive software
+          become: true
+          archive:
+            format: zip
+            dest: "/var/www/html/sampleapp-{{ scm_result['after'] }}.zip"
+            path: "{{ tmpdir.path }}/output/"
+
+        - name: Store location
+          set_stats:
+             data:
+               build_location: "http://{{ ansible_host }}/sampleapp-{{ scm_result['after'] }}.zip"
+    
+        - name: Display location
+          debug:
+             msg: "Build is at http://{{ ansible_host }}/sampleapp-{{ scm_result['after'] }}.zip"
+
+      always:
+        
+        - name: Cleanup
+          file:
+            path: "{{ tmpdir.path }}"
+            state: "absent"
+
+   

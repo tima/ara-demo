@@ -1,0 +1,23 @@
+---
+- hosts: builder
+  gather_facts: False
+  
+  tasks:
+    - name: Check that site is up, get page
+      uri:
+        url: "{{ site }}"
+        return_content: True
+      register: sitedata
+
+    - name: Check for proper GitHub URL
+      fail:
+        msg: "https://github.com/ansible not present on page"
+      when: "'https://github.com/ansible' not in sitedata.content"
+
+    - name: Check for proper Twitter URL
+      fail:
+        msg: "https://twitter.com/ansible not present on page"
+      when: "'https://twitter.com/ansible' not in sitedata.content"
+
+            
+  

@@ -1,0 +1,36 @@
+---
+- hosts: all
+  gather_facts: true
+  become_method: sudo
+  become_user: root
+  
+  tasks:
+    - name: Install required packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+      - httpd
+      - unzip
+
+    - name: Ensure webserver is running
+      service:
+        name: httpd
+        state: started
+    
+    - name: Remove old deployment
+      file:
+        path: /var/www/html
+        state: absent
+        
+    - name: Create directory
+      file:
+        path: /var/www/html
+        state: directory
+        mode: 0755
+        
+    - name: Download and deploy software
+      unarchive:
+        remote_src: True
+        src: "{{ build_location }}"
+        dest: /var/www/html
