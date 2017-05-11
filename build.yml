@@ -30,6 +30,7 @@
       - httpd
       - git
       - python2-pelican
+      - python-six
       - zip
     
     - name: Ensure webserver is running
