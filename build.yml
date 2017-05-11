@@ -5,6 +5,12 @@
   become_user: root
 
   tasks:
+    - name: Install EPEL
+      yum:
+        name: epel-release
+        state: present
+      become: true
+
     - name: Install repo
       yum_repository:
         name: pelican
