@@ -13,6 +13,7 @@
         enabled: True
         gpgcheck: False
         state: present
+      become: true
 
     - name: Install required packages
       yum:
@@ -29,6 +30,7 @@
       service:
         name: httpd
         state: started
+      become: true
 
     - name: Build a temporary directory
       tempfile:

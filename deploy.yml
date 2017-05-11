@@ -9,6 +9,7 @@
       yum:
         name: "{{ item }}"
         state: present
+      become: true
       with_items:
       - httpd
       - unzip
@@ -17,20 +18,24 @@
       service:
         name: httpd
         state: started
+      become: true
     
     - name: Remove old deployment
       file:
         path: /var/www/html
         state: absent
+      become: true
         
     - name: Create directory
       file:
         path: /var/www/html
         state: directory
         mode: 0755
+      become: true
         
     - name: Download and deploy software
       unarchive:
         remote_src: True
         src: "{{ build_location }}"
         dest: /var/www/html
+      become: true
