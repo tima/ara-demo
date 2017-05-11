@@ -6,7 +6,7 @@
   tasks:
     - name: Check that site is up, get page
       uri:
-        url: "{{ site }}"
+        url: "http://{{ ansible_host }}"
         return_content: True
       register: sitedata
 
