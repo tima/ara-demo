@@ -23,14 +23,14 @@
     - name: Read old revision
       slurp:
         src: /var/www/html/.scm_rev
-      register: result
+      register: oldrev
       ignore_errors: true
 
     - name: Store old revision
       set_stats:
         data:
-          old_rev: "{{ result['content']| b64decode }}"
-      when: result|succeeded
+          old_revision: "{{ oldrev['content']| b64decode }}"
+      when: oldrev|succeeded
 
     - name: Remove old deployment
       file:
@@ -48,10 +48,10 @@
     - name: Download and deploy software
       unarchive:
         remote_src: True
-        src: "{{ build_location }}"
+        src: "{{ build_location | regex_replace(scm_rev,old_rev) }}"
         dest: /var/www/html
       become: true
-
+    
     - name: Add revision marker
       copy:
         dest: /var/www/html/.scm_rev

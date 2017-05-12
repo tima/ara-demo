@@ -18,7 +18,7 @@
         baseurl: http://notting.fedorapeople.org/pelican/
         enabled: True
         gpgcheck: False
-        state: present
+        state: latest
       become: true
 
     - name: Install required packages
@@ -69,6 +69,7 @@
           set_stats:
              data:
                build_location: "http://{{ ansible_host }}/sampleapp-{{ scm_result['after'] }}.zip"
+               scm_rev: "{{ scm_result['after'] }} "
     
         - name: Display location
           debug:
