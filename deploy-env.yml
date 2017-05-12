@@ -1,0 +1,57 @@
+---
+- hosts: web
+  gather_facts: true
+  become_method: sudo
+  become_user: root
+  
+  tasks:
+    - name: Install required packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      become: true
+      with_items:
+      - httpd
+      - unzip
+
+    - name: Ensure webserver is running
+      service:
+        name: httpd
+        state: started
+      become: true
+
+- hosts: loadbalancer
+  gather_facts: true
+  become_method: sudo
+  become_user: root
+  
+  tasks:
+    - name: Install required packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      become: true
+      with_items:
+      - haproxy
+
+    - name: Install HAProxy configuration
+      template:
+        src: files/haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+      become: true
+      register: config
+
+    - name: Ensure loadbalancer is running
+      service:
+        name: haproxy
+        state: started
+      become: true
+      when: not config|changed
+
+    - name: Restart haproxy
+      service:
+        name: haproxy
+        state: restarted
+      become: true
+      when: config|changed
+

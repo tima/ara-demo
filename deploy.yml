@@ -1,25 +1,33 @@
 ---
-- hosts: all
+- hosts: web
   gather_facts: true
   become_method: sudo
   become_user: root
+  serial: 1
   
   tasks:
-    - name: Install required packages
-      yum:
-        name: "{{ item }}"
-        state: present
+    - name: Disable the server in haproxy
+      haproxy:
+        state: disabled
+        backend: sampleapp
+        host: "{{ inventory_hostname }}"
+        socket: /var/lib/haproxy/stats
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups.loadbalancer }}"
       become: true
-      with_items:
-      - httpd
-      - unzip
 
-    - name: Ensure webserver is running
+    - name: Stop webserver
       service:
         name: httpd
-        state: started
+        state: stopped
       become: true
-    
+
+    - name: Update webserver, if needed
+      yum:
+        name: httpd
+        state: latest
+      become: true
+
     - name: Read old revision
       slurp:
         src: /var/www/html/.scm_rev
@@ -61,3 +69,24 @@
         content: "{{ scm_rev }}"
       become: true
       when: scm_rev is defined
+
+    - name: Start webserver
+      service:
+        name: httpd
+        state: started
+      become: true
+
+    - name: Perform basic sanity check
+      uri:
+        url: "http://{{ ansible_host }}"
+        return_content: True
+
+    - name: Enable the server in haproxy
+      haproxy:
+        state: enabled
+        backend: sampleapp
+        host: "{{ inventory_hostname }}"
+        socket: /var/lib/haproxy/stats
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups.loadbalancer }}"
+      become: true
