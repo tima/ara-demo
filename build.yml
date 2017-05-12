@@ -18,13 +18,13 @@
         baseurl: http://notting.fedorapeople.org/pelican/
         enabled: True
         gpgcheck: False
-        state: latest
+        state: present
       become: true
 
     - name: Install required packages
       yum:
         name: "{{ item }}"
-        state: present
+        state: latest
       become: true
       with_items:
       - httpd
