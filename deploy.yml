@@ -38,6 +38,8 @@
       set_stats:
         data:
           old_rev: "{{ result['content']| b64decode }}"
+        aggregate: no
+        per_host: no
       when: result|succeeded
 
     - name: Remove old deployment
