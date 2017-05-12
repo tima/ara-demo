@@ -61,4 +61,3 @@
         content: "{{ scm_rev }}"
       become: true
       when: scm_rev is defined
-

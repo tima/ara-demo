@@ -19,6 +19,3 @@
       fail:
         msg: "https://twitter.com/ansible not present on page"
       when: "'https://twitter.com/ansible' not in sitedata.content"
-
-            
-  

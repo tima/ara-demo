@@ -82,4 +82,3 @@
             path: "{{ tmpdir.path }}"
             state: "absent"
 
-   
