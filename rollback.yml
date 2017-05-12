@@ -20,18 +20,6 @@
         state: started
       become: true
     
-    - name: Read old revision
-      slurp:
-        src: /var/www/html/.scm_rev
-      register: oldrev
-      ignore_errors: true
-
-    - name: Store old revision
-      set_stats:
-        data:
-          old_revision: "{{ oldrev['content']| b64decode }}"
-      when: oldrev|succeeded
-
     - name: Remove old deployment
       file:
         path: /var/www/html
