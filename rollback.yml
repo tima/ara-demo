@@ -56,7 +56,7 @@
       copy:
         dest: /var/www/html/.scm_rev
         mode: 0644
-        user: root
+        owner: root
         group: root
         content: "{{ scm_rev }}"
       become: true
