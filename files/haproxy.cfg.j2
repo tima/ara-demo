@@ -30,10 +30,10 @@ defaults
     maxconn                 3000
 
 backend app
-    {% for host in groups.loadbalancer %}
+    {% for host in groups.tag_group_loadbalancer %}
     	listen sampleapp 0.0.0.0:80
     {% endfor %}
     balance     roundrobin
-    {% for host in groups.web %}
+    {% for host in groups.tag_group_web %}
         server {{ host }} {{ hostvars[host]['ansible_default_ipv4'].address }}:80
     {% endfor %}
