@@ -1,5 +1,5 @@
 ---
-- hosts: web
+- hosts: tag_group_web
   gather_facts: true
   become_method: sudo
   become_user: root
@@ -13,7 +13,7 @@
         host: "{{ inventory_hostname }}"
         socket: /var/lib/haproxy/stats
       delegate_to: "{{ item }}"
-      with_items: "{{ groups.loadbalancer }}"
+      with_items: "{{ groups.tag_group_loadbalancer }}"
       become: true
 
     - name: Stop webserver
@@ -90,5 +90,5 @@
         host: "{{ inventory_hostname }}"
         socket: /var/lib/haproxy/stats
       delegate_to: "{{ item }}"
-      with_items: "{{ groups.loadbalancer }}"
+      with_items: "{{ groups.tag_group_loadbalancer }}"
       become: true
