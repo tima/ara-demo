@@ -13,7 +13,7 @@
     - name: Check for proper GitHub URL
       fail:
         msg: "https://github.com/ansible not present on page"
-      when: "'https://github.com/ansible' not in sitedata.content"
+      when: "'https://github.com/anzzzsible' not in sitedata.content"
 
     - name: Check for proper Twitter URL
       fail:
